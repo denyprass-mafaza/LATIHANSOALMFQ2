@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CBT MFQ OMBN 2027 – SMP/MTs</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f5ee;--fg:#1d2a24;--card:#fff;--line:#d9d6c8;--pri:#0f5132;--onpri:#fff;--acc:#b8890b;--ok:#1b7a3d;--bad:#b3261e;--mut:#5d6a63;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#111a16;--fg:#e8eee9;--card:#18241e;--line:#2c3b33;--pri:#5fbf8a;--onpri:#0b1a12;--acc:#e0b546;--ok:#6fd08f;--bad:#ff8a80;--mut:#9fb1a6}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111a16;--fg:#e8eee9;--card:#18241e;--line:#2c3b33;--pri:#5fbf8a;--onpri:#0b1a12;--acc:#e0b546;--ok:#6fd08f;--bad:#ff8a80;--mut:#9fb1a6}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:10}
+.ar{font-family:Amiri,"Traditional Arabic",serif;font-size:1.35em;line-height:1.9;display:inline-block}
+main{max-width:860px;margin:0 auto;padding:16px}
+h1{font-size:1.6rem;line-height:1.2;margin:.2em 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:12px 0}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input,select{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:10px 14px;min-height:44px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.pri{background:var(--pri);color:var(--onpri);border-color:var(--pri);font-weight:700}
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;background:var(--card);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:8px 16px;gap:8px}
+.timer{font-weight:700;font-variant-numeric:tabular-nums;font-size:1.25rem}
+.timer.low{color:var(--bad)}
+.opt{display:flex;gap:10px;width:100%;text-align:left;margin:8px 0;align-items:flex-start}
+.opt b{min-width:1.6em}
+.opt.sel{border-color:var(--pri);background:color-mix(in srgb,var(--pri) 14%,var(--card));box-shadow:inset 4px 0 0 var(--pri)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px}
+.grid button{padding:0;font-weight:600}
+.grid .a{background:var(--pri);color:var(--onpri);border-color:var(--pri)}
+.grid .f{box-shadow:inset 0 -5px 0 var(--acc)}
+.grid .c{outline:3px solid var(--fg)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.row>*{flex:1}
+.mut{color:var(--mut);font-size:.92rem}
+.score{font-size:3rem;font-weight:700;line-height:1;color:var(--pri)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stats div{border:1px solid var(--line);border-radius:8px;padding:8px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse}td,th{padding:6px;border-bottom:1px solid var(--line);text-align:left}
+.rv{border-left:4px solid var(--line);padding-left:10px;margin:14px 0}
+.rv.t{border-color:var(--ok)}.rv.w{border-color:var(--bad)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+var BID=["Al-Qur’an","Al-Hadits","Aqidah","Akhlaq","Tarikh"];
+var PA=[
+["Makna لِتَعَارَفُوا dalam QS. Al-Hujurat: 13 adalah ....",["agar saling berlomba","agar saling menasihati","agar saling mengenal","agar saling membantu"],2],
+["يَرْفَعِ اللَّهُ الَّذِينَ آمَنُوا مِنْكُمْ وَالَّذِينَ أُوتُوا الْعِلْمَ دَرَجَاتٍ (QS. Al-Mujadilah: 11) menunjukkan bahwa Allah akan ....",["meninggikan derajat orang beriman dan berilmu","mencukupkan rezeki mereka","menguji mereka","mengampuni dosa mereka"],0],
+["Makna أُمَّةً وَسَطًا dalam QS. Al-Baqarah: 143 adalah umat yang ....",["paling banyak jumlahnya","paling dahulu hadir","paling kuat","pilihan, adil, dan seimbang"],3],
+["Lanjutan ayat سَبِّحِ اسْمَ رَبِّكَ الْأَعْلَى (QS. Al-A’la: 1) adalah ....",["الَّذِي أَخْرَجَ الْمَرْعَى","الَّذِي خَلَقَ فَسَوَّى","وَالَّذِي قَدَّرَ فَهَدَى","فَجَعَلَهُ غُثَاءً أَحْوَى"],1],
+["Lanjutan ayat وَمَا أَدْرَاكَ مَا الطَّارِقُ (QS. At-Thariq: 2) adalah ....",["النَّجْمُ الثَّاقِبُ","فَلْيَنْظُرِ الْإِنْسَانُ مِمَّ خُلِقَ","إِنَّهُ عَلَى رَجْعِهِ لَقَادِرٌ","وَالسَّمَاءِ ذَاتِ الرَّجْعِ"],0],
+["Potongan ayat QS. Al-Infitar tersusun acak:\n1) وَإِذَا الْبِحَارُ فُجِّرَتْ\n2) إِذَا السَّمَاءُ انْفَطَرَتْ\n3) وَإِذَا الْكَوَاكِبُ انْتَثَرَتْ\n4) وَإِذَا الْقُبُورُ بُعْثِرَتْ\nUrutan yang benar adalah ....",["1 – 2 – 3 – 4","2 – 1 – 3 – 4","2 – 3 – 1 – 4","3 – 2 – 1 – 4"],2],
+["Sekelompok siswa enggan berteman dengan teman yang berbeda suku. Pesan QS. Al-Hujurat: 13 yang tepat untuk menanggapinya adalah ....",["kemuliaan ditentukan oleh asal suku","keberagaman agar manusia saling mengenal, dan kemuliaan diukur dengan takwa","setiap suku sebaiknya bergaul dengan sukunya sendiri","perbedaan suku harus dihilangkan"],1],
+["Rina meneliti ekosistem sungai, menyimpulkan kebesaran Allah, lalu makin rajin berzikir. Sikap ini sesuai ciri ulul albab (QS. Ali ‘Imran: 190–191), yaitu ....",["menghindari berpikir tentang alam","zikir tanpa memikirkan ciptaan Allah","mengandalkan akal tanpa iman","memadukan zikir dengan tafakur terhadap ciptaan Allah"],3],
+["Sikap yang sesuai semangat fastabiqul khairat (QS. Al-Baqarah: 148) saat dua tim sekolah bertanding adalah ....",["berlomba meraih prestasi dengan sportif dan saling menghargai","menjatuhkan tim lawan","mengundurkan diri agar tidak bersaing","menang dengan cara apa pun"],0],
+["Dua teman sekelas bertengkar karena salah paham. Menurut QS. Al-Hujurat: 10, tindakan paling tepat adalah ....",["membiarkan mereka","memihak teman yang dekat","mendamaikan karena orang beriman bersaudara","menyebarkan masalah mereka"],2],
+["Hadits الْكَيِّسُ مَنْ دَانَ نَفْسَهُ وَعَمِلَ لِمَا بَعْدَ الْمَوْتِ. Orang cerdas menurut hadits tersebut adalah ....",["yang paling banyak hartanya","yang mengendalikan diri dan beramal untuk kehidupan setelah mati","yang paling tinggi jabatannya","yang paling banyak hafalannya tanpa diamalkan"],1],
+["Seorang siswa sering menghina teman di grup kelas. Perilaku ini bertentangan dengan hadits ....",["إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ","طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ","الصَّلَاةُ فِي جَمَاعَةٍ تَفْضُلُ صَلَاةَ الْفَذِّ","الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ"],3],
+["Andi menyampaikan ucapan Budi kepada Cahyo agar mereka bertengkar. Perbuatan ini disebut ... dan diancam hadits لَا يَدْخُلُ الْجَنَّةَ نَمَّامٌ.",["namimah (adu domba)","tabayyun","nasihat","tasamuh"],0],
+["Hadits أَحَبُّ الدِّينِ إِلَى اللَّهِ الْحَنِيفِيَّةُ السَّمْحَةُ mengajarkan agama yang dicintai Allah adalah agama yang ....",["keras dalam segala hal","mempersulit pemeluknya","lurus, lapang, dan toleran","membolehkan semua hal tanpa batas"],2],
+["Hadits tentang menanam pohon yang buahnya dimakan burung, manusia, atau hewan akan menjadi sedekah mendorong umat Islam untuk ....",["menebang pohon untuk dijual","melestarikan lingkungan sebagai amal jariyah","menanam hanya jika diperintah sekolah","mengabaikan alam demi ibadah ritual"],1],
+["Kaum musyrik Makkah mengakui Allah sebagai pencipta dan pengatur alam, tetapi tetap menyembah berhala. Kekurangan mereka ada pada tauhid ....",["Rububiyah","Asma wa Sifat","Mulkiyah","Uluhiyah"],3],
+["Setelah gagal berkali-kali, Dika tetap berusaha dan yakin Allah akan membukakan jalan keluar. Ini mencerminkan Asmaul Husna ....",["Al-Fattah","Al-Hafizh","Al-Basith","Al-‘Adl"],0],
+["Urutan yang benar dari alam kubur hingga perhitungan amal adalah ....",["Hisab – Mahsyar – Ba’ats – Barzakh","Barzakh – Mahsyar – Ba’ats – Hisab","Barzakh – Ba’ats – Mahsyar – Hisab","Ba’ats – Barzakh – Hisab – Mahsyar"],2],
+["Nilai ujian Sinta turun. Ia tidak menyalahkan nasib, tetapi belajar lebih giat karena yakin hasil dapat berubah dengan usaha. Ini sesuai konsep ....",["takdir mubram","takdir mu’allaq yang berkaitan dengan ikhtiar","fatalisme","tawakal tanpa ikhtiar"],1],
+["Seorang siswa memposting kegiatan tilawahnya semata-mata agar dipuji pengikutnya. Perbuatan ini termasuk ....",["ikhlas","tabayyun","khurafat","riya’ (syirik khafi)"],3],
+["Tim olimpiade telah berlatih maksimal, lalu menyerahkan hasilnya kepada Allah dengan tenang. Sikap ini disebut ....",["tawakal","tamak","ujub","putus asa"],0],
+["Dewi ingin gawai terbaru, tetapi menerima dengan lapang dada gawai sederhana dari orang tuanya dan tetap rajin belajar. Dewi menunjukkan akhlak ....",["hasad","riya’","qana’ah","israf"],2],
+["Kamu menerima pesan berantai berisi kabar mengejutkan tanpa sumber jelas. Tindakan sesuai budaya tabayyun adalah ....",["membagikannya ke grup lain","memeriksa kebenaran dan sumbernya sebelum membagikan","mengomentari tanpa membaca isi","mempercayainya karena banyak yang membagikan"],1],
+["Tetangga Ayu merayakan hari raya agamanya. Sikap tasamuh yang tepat adalah ....",["mengikuti ibadah mereka","mengejek perayaan mereka","menjauhi mereka","menghormati dan bermuamalah baik tanpa mencampuradukkan ibadah"],3],
+["Kontribusi siswa paling tepat untuk membantu mengendalikan perubahan iklim di sekolah adalah ....",["mengurangi sampah plastik, memilah sampah, dan menghemat listrik serta air","membakar sampah","membiarkan lampu menyala seharian","membuang sampah ke saluran air"],0],
+["Substansi penting Piagam Madinah adalah ....",["penguasaan Madinah oleh satu suku","kewajiban semua penduduk memeluk Islam","jaminan kebebasan beragama dan kewajiban saling membela Madinah","larangan berdagang dengan non-Muslim"],2],
+["Sahabat Khulafaur Rasyidin yang membeli sumur Raumah dan mewakafkannya untuk kaum muslimin adalah ....",["Abu Bakar ash-Shiddiq","Utsman bin Affan","Umar bin Khattab","Ali bin Abi Thalib"],1],
+["Pusat penerjemahan dan pengembangan ilmu pada masa Daulah Abbasiyah di Baghdad bernama ....",["Baitul Hikmah","Darul Arqam","Masjid Quba","Al-Hambra"],0],
+["Wali yang berdakwah dengan akulturasi budaya melalui wayang dan tembang adalah ....",["Sunan Gresik","Sunan Ampel","Sunan Giri","Sunan Kalijaga"],3],
+["Tokoh Muhammadiyah dari kepanduan Hizbul Wathan yang memimpin perang gerilya sebagai Panglima Besar TNI adalah ....",["Buya Hamka","K.H. Mas Mansur","Jenderal Soedirman","Nyai Ahmad Dahlan"],2]
+];
+var PB=[
+["Makna لَكُمْ دِينُكُمْ وَلِيَ دِينِ (QS. Al-Kafirun: 6) adalah ....",["Aku akan mengikuti agamamu","Untukmu agamamu, dan untukku agamaku","Agamamu dan agamaku sama","Kita beribadah bersama-sama"],1],
+["Makna أُولِي الْأَلْبَابِ dalam QS. Ali ‘Imran: 190 adalah ....",["orang-orang kaya","orang-orang kuat","orang-orang yang berakal","orang-orang berkuasa"],2],
+["Makna إِنَّ أَكْرَمَكُمْ عِنْدَ اللَّهِ أَتْقَاكُمْ (QS. Al-Hujurat: 13) adalah ....",["yang paling kaya di sisi Allah ialah yang paling dermawan","yang paling kuat di sisi Allah ialah yang paling berilmu","yang paling dekat dengan Allah ialah yang paling terkenal","yang paling mulia di sisi Allah ialah yang paling bertakwa"],3],
+["Lanjutan ayat عَمَّ يَتَسَاءَلُونَ (QS. An-Naba: 1) adalah ....",["عَنِ النَّبَإِ الْعَظِيمِ","كَلَّا سَيَعْلَمُونَ","أَلَمْ نَجْعَلِ الْأَرْضَ مِهَادًا","وَجَعَلْنَا نَوْمَكُمْ سُبَاتًا"],0],
+["Lanjutan ayat وَالسَّمَاءِ ذَاتِ الْبُرُوجِ (QS. Al-Buruj: 1) adalah ....",["وَالسَّمَاءِ وَالطَّارِقِ","وَالْفَجْرِ وَلَيَالٍ عَشْرٍ","وَالْيَوْمِ الْمَوْعُودِ","لَا أُقْسِمُ بِهَذَا الْبَلَدِ"],2],
+["Potongan ayat QS. Al-Fajr tersusun acak:\n1) وَاللَّيْلِ إِذَا يَسْرِ\n2) وَالشَّفْعِ وَالْوَتْرِ\n3) وَالْفَجْرِ\n4) وَلَيَالٍ عَشْرٍ\nUrutan yang benar adalah ....",["3 – 2 – 4 – 1","3 – 4 – 2 – 1","1 – 2 – 3 – 4","4 – 3 – 2 – 1"],1],
+["Di perpustakaan yang penuh, seorang teman mencari tempat duduk. Sikap yang sesuai QS. Al-Mujadilah: 11 tentang memberi kelapangan dalam majelis adalah ....",["membiarkan temannya berdiri","menaruh tas di kursi kosong","menyuruh temannya pergi","memberi kelapangan tempat dengan ramah"],3],
+["Menurut QS. Al-Ma’idah: 48, Allah menjadikan manusia berbeda-beda agar ....",["mereka diuji dan berlomba dalam kebaikan","mereka saling bermusuhan","satu golongan menguasai yang lain","mereka berpisah dan tidak saling mengenal"],0],
+["Sebagai umat wasathan (QS. Al-Baqarah: 143), sikap yang tepat terhadap perbedaan pendapat adalah ....",["membenarkan kelompok sendiri dan menolak yang berbeda","bersikap adil dan seimbang, tidak berlebihan dan tidak meremehkan","membenci siapa pun yang berbeda pendapat","menghindari pergaulan dengan siapa saja"],1],
+["Teman non-Muslim mengajakmu ikut ibadah agamanya. Sesuai QS. Al-Kafirun, sikap yang tepat adalah ....",["ikut agar tidak menyinggung","memusuhinya","menolak dengan santun dan tetap menghormatinya","memutus pertemanan"],2],
+["Hadits طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ. Seorang kakek berusia 65 tahun rajin ikut kajian dan belajar membaca Al-Qur’an. Sikap ini ....",["sesuai hadits: menuntut ilmu wajib sepanjang hayat","tidak perlu karena sudah tua","hanya berlaku untuk anak sekolah","hanya berlaku saat ada ujian"],0],
+["Rudi iri pada prestasi temannya lalu menyebarkan keburukan temannya. Perilaku ini dilarang dalam hadits ....",["إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ","أَحَبُّ الدِّينِ إِلَى اللَّهِ الْحَنِيفِيَّةُ السَّمْحَةُ","الْكَيِّسُ مَنْ دَانَ نَفْسَهُ","لَا تَحَاسَدُوا وَلَا تَنَاجَشُوا"],3],
+["Dina membicarakan kekurangan Rani yang memang benar adanya, tanpa sepengetahuan Rani, dan Rani tidak menyukainya. Perbuatan ini disebut ....",["fitnah","ghibah","tabayyun","nasihat"],1],
+["Tetangga non-Muslim bertamu ke rumahmu. Sikap sesuai hadits tentang memuliakan tamu dan tetangga adalah ....",["menolak kedatangannya","menyambutnya tanpa peduli","menyambut dan memuliakannya dengan baik","mengusirnya secara halus"],2],
+["Hadits tentang shalat berjamaah menyebut keutamaannya dibanding shalat sendirian sebanyak ....",["25 derajat","27 derajat","30 derajat","10 derajat"],1],
+["Meyakini nama dan sifat Allah sebagaimana disebut dalam Al-Qur’an dan hadits, tanpa mengubah atau menyerupakannya dengan makhluk, adalah tauhid ....",["Rububiyah","Uluhiyah","Asma wa Sifat","Mulkiyah"],2],
+["Yadi yakin hanya Allah yang Maha Kaya dan tidak membutuhkan apa pun, sehingga ia tidak mengemis kepada manusia. Ini mencerminkan Asmaul Husna ....",["Al-Ghaniyy","Al-Qayyum","Al-Lathif","Ar-Ra’uf"],0],
+["Peristiwa berkumpulnya seluruh manusia di suatu tempat setelah dibangkitkan dari kubur disebut ....",["Barzakh","Ba’ats","Hisab","Mahsyar"],3],
+["Contoh takdir mubram yang tidak dapat diubah dengan ikhtiar adalah ....",["nilai ujian siswa yang malas belajar","waktu kematian seseorang","kesehatan karena pola hidup sehat","kekayaan karena bekerja keras"],1],
+["Seorang siswa percaya ‘baju keberuntungan’ menjamin lulus ujian tanpa perlu belajar. Keyakinan ini termasuk ....",["takhayul","ikhtiar","tawakal","qana’ah"],0],
+["Hana gagal lolos seleksi olimpiade, tetapi tidak putus asa, berintrospeksi, dan berlatih lagi. Sikap Hana disebut ....",["hasad","ujub","sabar","marah"],2],
+["Meneladani Rasulullah ﷺ, Aldi membiasakan shalat dhuha setiap hari meskipun sibuk. Sikap ini disebut ....",["riya’","ujub","takabur","istiqamah"],3],
+["Kamu melihat teman diejek karena fisiknya di grup kelas. Tindakan terbaik adalah ....",["ikut menertawakan agar diterima","tidak ikut menertawakan, menegur pelaku, dan melapor kepada guru","mengabaikan karena bukan urusanmu","merekam dan menyebarkannya"],1],
+["Orang tua memanggilmu saat kamu asyik bermain gawai. Sikap birrul walidain yang tepat adalah ....",["segera memenuhi panggilan dengan santun","menunda sampai permainan selesai","menjawab dengan nada tinggi","pura-pura tidak mendengar"],0],
+["Perilaku yang bertentangan dengan larangan berbuat kerusakan di bumi (QS. Al-A’raf: 56) adalah ....",["menghemat air","menanam pohon","membuang limbah ke sungai","memilah sampah"],2],
+["Sikap Rasulullah ﷺ terhadap penduduk Makkah saat Fathu Makkah adalah ....",["membalas dendam kepada kaum Quraisy","mengusir penduduk Makkah","menghukum semua penentang","memberi maaf secara umum"],3],
+["Sahabat yang menggantikan tidur di tempat tidur Rasulullah ﷺ pada malam hijrah adalah ....",["Abu Bakar ash-Shiddiq","Ali bin Abi Thalib","Umar bin Khattab","Utsman bin Affan"],1],
+["Karya Ibnu Sina di bidang kedokteran yang menjadi rujukan hingga Eropa adalah ....",["Al-Qanun fi at-Thibb","Al-Jabr wal Muqabalah","Muqaddimah","Ihya’ ‘Ulumuddin"],0],
+["Kerajaan Islam pertama di Nusantara yang umum dikenal adalah ....",["Demak","Mataram Islam","Samudra Pasai","Banten"],2],
+["Nyai Ahmad Dahlan (Siti Walidah) dikenal sebagai pelopor organisasi perempuan Muhammadiyah bernama ....",["Hizbul Wathan","Ikatan Pelajar Muhammadiyah","Tapak Suci","‘Aisyiyah"],3]
+];
+var Q=PA;
+var DUR=3600000,KEY="mfq-cbt-v1",L="ABCD",app=document.getElementById("app"),S=null,tick=null;
+function bid(i){return i<10?0:1+Math.floor((i-10)/5)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function fmt(s){return esc(s).replace(/[\u0600-\u06FF][\u0600-\u06FF\s\u064B-\u065F]*[\u0600-\u06FF\u064B-\u065F]/g,function(m){return'<span class="ar" dir="rtl">'+m+'</span>'}).replace(/\n/g,"<br>")}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{var r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){return null}}
+function clear(){try{localStorage.removeItem(KEY)}catch(e){}}
+function left(){return Math.max(0,S.start+DUR-Date.now())}
+function mmss(ms){var s=Math.ceil(ms/1000),m=Math.floor(s/60);return(m<10?"0":"")+m+":"+(s%60<10?"0":"")+(s%60)}
+function start(){
+ var v=function(id){return document.getElementById(id).value.trim()};
+ if(!v("team")||!v("m1")){document.getElementById("err").textContent="Isi nama tim dan minimal satu nama anggota.";return}
+ var pk=document.getElementById("pk").value;Q=pk==="B"?PB:PA;S={pk:pk,team:v("team"),school:v("school"),mem:[v("m1"),v("m2"),v("m3")].filter(Boolean),start:Date.now(),ans:Q.map(function(){return-1}),flag:[],cur:0,done:false,blur:0};
+ save();exam();
+}
+function home(){
+ clearInterval(tick);var old=load();
+ app.innerHTML='<h1>CBT MFQ OMBN 2027</h1><p class="mut">Musabaqah Fahmil Qur’an · Jenjang SMP/MTs · Babak Penyisihan</p>'+
+ '<div class="card"><b>Ketentuan</b><ul><li>30 soal pilihan ganda, waktu 60 menit.</li><li>Benar +3, salah +1, kosong 0. Skor maksimal 90.</li><li>Satu tim menjawab dari satu perangkat.</li></ul></div>'+
+ (old&&!old.done?'<div class="card"><b>Ujian sebelumnya belum selesai</b><p>Tim '+esc(old.team)+'</p><button class="pri" id="res">Lanjutkan ujian</button></div>':'')+
+ '<div class="card"><label for="team">Nama tim</label><input id="team" autocomplete="off"><label for="school">Asal sekolah/madrasah</label><input id="school" autocomplete="off"><label for="pk">Paket soal</label><select id="pk"><option value="A">Paket A</option><option value="B">Paket B</option></select><label for="m1">Anggota 1</label><input id="m1"><label for="m2">Anggota 2</label><input id="m2"><label for="m3">Anggota 3</label><input id="m3"><p id="err" class="bad" role="alert"></p><button class="pri" id="go" style="width:100%">Mulai ujian</button></div>';
+ document.getElementById("go").onclick=start;
+ var r=document.getElementById("res");if(r)r.onclick=function(){S=old;Q=S.pk==="B"?PB:PA;exam()};
+}
+function exam(){
+ clearInterval(tick);
+ var i=S.cur,q=Q[i];
+ var h='<header class="bar"><div><b>'+esc(S.team)+'</b><div class="mut">Soal '+(i+1)+' dari '+Q.length+' · '+BID[bid(i)]+'</div></div><div class="timer" id="tm">'+mmss(left())+'</div></header><main style="padding:0">';
+ h+='<div class="card"><p>'+fmt(q[0])+'</p>';
+ q[1].forEach(function(o,k){h+='<button class="opt'+(S.ans[i]===k?' sel':'')+'" data-k="'+k+'"><b>'+L[k]+'.</b><span>'+fmt(o)+'</span></button>'});
+ h+='<div class="row"><button id="pv"'+(i?'':' disabled')+'>Sebelumnya</button><button id="fl">'+(S.flag.indexOf(i)>-1?'Hapus tanda ragu':'Ragu-ragu')+'</button><button id="nx" class="pri"'+(i<Q.length-1?'':' disabled')+'>Berikutnya</button></div></div>';
+ h+='<div class="card"><div class="grid">';
+ Q.forEach(function(_,k){h+='<button class="'+(S.ans[k]>-1?'a ':'')+(S.flag.indexOf(k)>-1?'f ':'')+(k===i?'c':'')+'" data-n="'+k+'" aria-label="Soal '+(k+1)+'">'+(k+1)+'</button>'});
+ h+='</div><p class="mut">Hijau: terjawab · Garis emas: ragu-ragu · Bingkai tebal: soal saat ini</p><button id="fin" class="pri" style="width:100%">Selesai dan kirim jawaban</button></div></main>';
+ app.innerHTML=h;
+ app.querySelectorAll(".opt").forEach(function(b){b.onclick=function(){S.ans[i]=+b.dataset.k;save();exam()}});
+ app.querySelectorAll(".grid button").forEach(function(b){b.onclick=function(){S.cur=+b.dataset.n;save();exam()}});
+ document.getElementById("pv").onclick=function(){S.cur--;save();exam()};
+ document.getElementById("nx").onclick=function(){S.cur++;save();exam()};
+ document.getElementById("fl").onclick=function(){var p=S.flag.indexOf(i);p>-1?S.flag.splice(p,1):S.flag.push(i);save();exam()};
+ document.getElementById("fin").onclick=function(){
+  var n=S.ans.filter(function(a){return a<0}).length;
+  if(confirm((n?n+" soal belum dijawab. ":"")+"Akhiri ujian sekarang? Jawaban tidak dapat diubah.")){finish()}
+ };
+ tick=setInterval(function(){
+  var t=document.getElementById("tm");if(!t)return;var l=left();t.textContent=mmss(l);t.className="timer"+(l<300000?" low":"");
+  if(l<=0){alert("Waktu habis. Jawaban dikirim otomatis.");finish()}
+ },1000);
+}
+window.addEventListener("blur",function(){if(S&&!S.done&&document.getElementById("tm")){S.blur++;save()}});
+function finish(){clearInterval(tick);S.done=true;S.end=Math.min(Date.now(),S.start+DUR);save();result()}
+function result(){
+ var b=0,w=0,k=0,per=BID.map(function(){return[0,0]});
+ Q.forEach(function(q,i){var a=S.ans[i];per[bid(i)][1]++;if(a<0)k++;else if(a===q[2]){b++;per[bid(i)][0]++}else w++});
+ var sc=b*3+w,used=Math.round((S.end-S.start)/1000);
+ var h='<h1>Hasil ujian · Paket '+(S.pk||"A")+'</h1><div class="card"><b>'+esc(S.team)+'</b><div class="mut">'+esc(S.school)+(S.mem.length?' · '+S.mem.map(esc).join(', '):'')+'</div><p><span class="score">'+sc+'</span> <span class="mut">dari 90 poin</span></p>'+
+ '<div class="stats"><div><b class="ok">'+b+'</b><br>Benar (+3)</div><div><b class="bad">'+w+'</b><br>Salah (+1)</div><div><b>'+k+'</b><br>Kosong (0)</div></div>'+
+ '<p class="mut">Waktu pengerjaan '+Math.floor(used/60)+' menit '+used%60+' detik · Pindah jendela '+S.blur+' kali</p></div>'+
+ '<div class="card"><b>Per bidang</b><table>'+per.map(function(p,i){return'<tr><td>'+BID[i]+'</td><td>'+p[0]+' / '+p[1]+' benar</td></tr>'}).join('')+'</table></div>'+
+ '<div class="card"><b>Pembahasan jawaban</b>';
+ Q.forEach(function(q,i){
+  var a=S.ans[i],t=a===q[2];
+  h+='<div class="rv '+(t?'t':'w')+'"><div class="mut">Soal '+(i+1)+' · '+BID[bid(i)]+'</div><p>'+fmt(q[0])+'</p><div>Jawaban tim: '+(a<0?'<i>kosong</i>':'<b class="'+(t?'ok':'bad')+'">'+L[a]+'</b> '+fmt(q[1][a]))+'</div>'+(t?'':'<div>Kunci: <b class="ok">'+L[q[2]]+'</b> '+fmt(q[1][q[2]])+'</div>')+'</div>';
+ });
+ h+='</div><div class="row"><button id="pr">Cetak hasil</button><button id="nw" class="pri">Ujian baru</button></div>';
+ app.innerHTML=h;
+ document.getElementById("pr").onclick=function(){window.print()};
+ document.getElementById("nw").onclick=function(){if(confirm("Hapus hasil ini dan mulai ujian baru?")){clear();S=null;home()}};
+}
+var o=load();if(o&&o.done){S=o;Q=S.pk==="B"?PB:PA;result()}else home();
+</script>
+</body>
+</html>
